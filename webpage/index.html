@@ -1,0 +1,139 @@
+<html>
+<head>
+    <title>ESP Relay Control</title>
+</head>
+<body>
+    <center>
+        <p class='title'>Relay Status</p>
+
+        <div class='toggle-wrapper'>
+            <label class='toggle'>
+                <span class='text1'>Relay 1</span>
+                <input type='checkbox' id = 'r1'>
+                <span class='slider'></span>
+            </label>
+        </div>
+
+        <div class='toggle-wrapper'>
+            <label class='toggle'>
+                <span class='text1'>Relay 2</span>
+                <input type='checkbox' id = 'r2'>
+                <span class='slider'></span>
+            </label>
+        </div>
+
+        <div class='toggle-wrapper'>
+            <label class='toggle'>
+                <span class='text1'>LCD <br>OFF ON</span>
+                <input type='checkbox' id = 'lcd'>
+                <span class='slider'></span>
+            </label>
+        </div>
+    </center>
+
+    <style>
+        body {
+            background-color: darkgray;
+        }
+
+        .text1 {
+            position: relative;
+            color: black;
+            font-size: 30px;
+        }
+
+        .title {
+            color: red;
+            font-size: 52px;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .toggle {
+            position: relative;
+            display: inline-block;
+            block-size: 32px;
+            color: black;
+            cursor: pointer;
+            width: 120px;
+            height: 80px;
+            background-color: rgb(102, 76, 145);
+            border: 1px solid black;
+        }
+        
+        .toggle input[type='checkbox'] {
+            display: none;
+        }
+
+        .toggle .slider::before {
+            position: absolute;
+            content: '';
+            height: 40px;
+            width: 60px;
+            left: 0px;
+            bottom: 0px;
+            background-color: green;
+            transition: .4s;
+        }
+
+        .toggle input[type='checkbox']:checked + .slider::before {
+            transform: translateX(60px);
+            background-color: red;
+        }
+    </style>
+
+    <script>
+        let Socket;
+        const toggle1 = document.getElementById('r1');
+        const toggle2 = document.getElementById('r2');
+        const lcdToggle = document.getElementById('lcd');
+        toggle1.addEventListener('change', 
+            function(){
+                let sendVal = 0;
+                if(toggle1.checked){
+                    sendVal = 0b00000001;
+                }
+                else{
+                    sendVal = 0b00000000;
+                }
+                Socket.send(sendVal);
+            }
+        );
+        
+        toggle2.addEventListener('change', 
+            function(){
+                let sendVal = 0;
+                if(toggle2.checked){
+
+                    sendVal = 0b00000011;
+                }
+                else{
+                    sendVal = 0b00000010;
+                }
+                Socket.send(sendVal);
+            }
+        );
+
+        lcdToggle.addEventListener('change', 
+            function(){
+                let sendVal = 0;
+                if(lcdToggle.checked){
+                    sendVal = 0b00001000;
+                }
+                else{
+                    sendVal = 0b00000100;
+                }
+                Socket.send(sendVal);
+            }
+        );
+        
+        window.onload = function(event) {
+            Socket = new WebSocket('ws://' + window.location.hostname + ':81/');
+        }
+    </script>
+</body>
+</html>
